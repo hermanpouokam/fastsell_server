@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "641462030163",
+    "firebase_url": "https://fastsell-a883b-default-rtdb.firebaseio.com",
+    "project_id": "fastsell-a883b",
+    "storage_bucket": "fastsell-a883b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:641462030163:android:4961b3203fa9e2ccdb5ba6",
+        "android_client_info": {
+          "package_name": "com.fastsell"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "641462030163-3umptiru9vmh3d6cgc0om7cocvr2coj4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fastsell",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "641462030163-k6plvvhilst2l3qeu6pkqf2u12e3cjah.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjyhduqg-Ifi9ImdcPrrzL5u2epvjheS8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "641462030163-k6plvvhilst2l3qeu6pkqf2u12e3cjah.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
