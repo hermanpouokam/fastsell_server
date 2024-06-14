@@ -1,8 +1,5 @@
 
 from pathlib import Path
-import firebase_admin
-from firebase_admin import credentials
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-#68m!=&o$095#kn7qkzya8mo=3%i5@wn6ci@l60u&)=2h(x=ok'
 DEBUG = True
@@ -16,7 +13,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
-    'ai_api'
 ]
 
 MIDDLEWARE = [

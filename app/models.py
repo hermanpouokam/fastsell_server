@@ -5,10 +5,16 @@ from django.conf import settings
 class CustomUser(AbstractUser):
     number = models.CharField(max_length=20,blank=True)
     user_type = models.CharField(max_length=1000,blank=True,default='user')
+    uid = models.CharField(max_length=55,blank=True,null=True)
     profile_pic = models.TextField(blank=True,null=True)
     lat = models.FloatField(null=True, blank=True)
     lon = models.FloatField(null=True, blank=True)
     deleted=models.BooleanField(default=False)
+    is_verified=models.BooleanField(default=False)
+    is_certified=models.BooleanField(default=False)
+    bio = models.TextField(blank=True, null=True)
+    cover_pic = models.TextField(blank=True, null=True)  
+    is_first_login=models.BooleanField(default=True)
     lastseen = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -124,3 +130,16 @@ class UserTag(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.tag.text}"
+    
+class Follower(models.Model):
+    user = models.ForeignKey(CustomUser, related_name='following', on_delete=models.CASCADE)
+    follower = models.ForeignKey(CustomUser, related_name='followers', on_delete=models.CASCADE)
+    followed_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    following = models.BooleanField(default=False)  # New field to indicate following status
+
+    class Meta:
+        unique_together = ('user', 'follower')
+
+    def __str__(self):
+        return f'{self.follower} follows {self.user}'

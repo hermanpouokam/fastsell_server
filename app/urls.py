@@ -1,6 +1,6 @@
 
 from django.urls import path
-from .views import UserListCreateView, UserRetrieveUpdateDestroyView,PostListCreateView, PostRetrieveUpdateDestroyView,ImageListCreateView,ImageRetrieveUpdateDestroyView,PostImagesListView,CommentListCreateView,CommentRetrieveUpdateDestroyView,ResponseCommentListCreateView,ResponseCommentRetrieveUpdateDestroyView,LikeListCreateView,LikeRetrieveUpdateDestroyView,TagListCreateView,TagRetrieveUpdateDestroyView,UserTagListCreateView,UserTagRetrieveUpdateDestroyView
+from .views import UserListCreateView, UserRetrieveUpdateDestroyView,PostListCreateView, PostRetrieveUpdateDestroyView,ImageListCreateView,ImageRetrieveUpdateDestroyView,PostImagesListView,CommentListCreateView,CommentRetrieveUpdateDestroyView,ResponseCommentListCreateView,ResponseCommentRetrieveUpdateDestroyView,LikeListCreateView,LikeRetrieveUpdateDestroyView,TagListCreateView,TagRetrieveUpdateDestroyView,UserTagListCreateView,UserTagRetrieveUpdateDestroyView,FollowerToggleAPIView
 from .functions import get_post_comments,get_comment_responses,get_user_posts,get_post_likes,get_user_tag_list
 
 urlpatterns = [
@@ -26,4 +26,6 @@ urlpatterns = [
     path('user-tags/', UserTagListCreateView.as_view(), name='user-tag-list-create'),
     path('user-tags/<int:id>/', UserTagRetrieveUpdateDestroyView.as_view(), name='user-tag-retrieve-update-destroy'),
     path('users/<int:user_id>/user-tags/', get_user_tag_list, name='user-tags-list'),
+    path('followers/<int:id>/toggle_follow/', FollowerToggleAPIView.as_view(), name='toggle-follow'),
+
 ]
