@@ -1,8 +1,11 @@
 # myapp/views.py
 
 from rest_framework import generics
-from .models import CustomUser,Post,Image,Comment,ResponseComment,Like,Tag,UserTag,Follower,ViewedPost
-from .serializers import CustomUserSerializer, PostSerializer,ImageSerializer,CommentSerializer,ResponseCommentSerializer,LikeSerializer,TagSerializer,UserTagSerializer,ViewedPostSerializer
+from .models import CustomUser,Post,Image,Comment,ResponseComment,Like,Tag,UserTag,Follower,ViewedPost,FavoriteUserPost
+from .serializers import (CustomUserSerializer, PostSerializer,ImageSerializer,CommentSerializer,
+                          ResponseCommentSerializer,LikeSerializer,TagSerializer,UserTagSerializer,ViewedPostSerializer,
+                          FavoriteUserPostSerializer
+                          )
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -175,9 +178,44 @@ class PostsViewedByUserAPIView(APIView):
         serializer = PostSerializer(posts_viewed, many=True)
         return Response(serializer.data)
 
-class UsersWhoViewedPostAPIView(APIView):
-    def get(self, request, post_id):
-        user_ids = ViewedPost.objects.filter(post_id=post_id).values_list('user_id', flat=True)
-        users = CustomUser.objects.filter(id__in=user_ids)
-        serializer = CustomUserSerializer(users, many=True)
-        return Response(serializer.data)
+class FavoriteUserPostListCreateAPIView(generics.ListCreateAPIView):
+    queryset = FavoriteUserPost.objects.all()
+    serializer_class = FavoriteUserPostSerializer
+
+    def post(self, request, *args, **kwargs):
+        user_id = request.data.get('user')
+        post_id = request.data.get('post')
+
+        if not user_id or not post_id:
+            return Response({"detail": "Both user and post IDs are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
+            return Response({"detail": f"User with id {user_id} does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            post = Post.objects.get(post_id=post_id)
+        except Post.DoesNotExist:
+            return Response({"detail": f"Post with id {post_id} does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class FavoriteUserPostRetrieveDestroyAPIView(generics.RetrieveDestroyAPIView):
+    queryset = FavoriteUserPost.objects.all()
+    serializer_class = FavoriteUserPostSerializer
+
+    def get_object(self):
+        id = self.kwargs.get('post_id')
+        return self.queryset.get(id=id)
+
+class FavoriteUserPostsByUserAPIView(generics.ListAPIView):
+    serializer_class = FavoriteUserPostSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']  # Assuming 'user_id' is passed in URL parameters
+        return FavoriteUserPost.objects.filter(user=user_id)

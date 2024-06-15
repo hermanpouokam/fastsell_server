@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from .models import CustomUser,Post,Image,Comment,ResponseComment,Like,Tag,UserTag,Follower,ViewedPost
+from .models import (CustomUser,Post,Image,Comment,ResponseComment,Like,Tag,UserTag,Follower,ViewedPost,FavoriteUserPost
+                     
+                     )
 
 
 
@@ -78,3 +80,8 @@ class ViewedPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = ViewedPost
         fields = ['user', 'post', 'created_at'] 
+    
+class FavoriteUserPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FavoriteUserPost
+        fields = ['id', 'user', 'post', 'created_at']
