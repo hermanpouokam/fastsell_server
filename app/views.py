@@ -1,8 +1,8 @@
 # myapp/views.py
 
 from rest_framework import generics
-from .models import CustomUser,Post,Image,Comment,ResponseComment,Like,Tag,UserTag,Follower
-from .serializers import CustomUserSerializer, PostSerializer,ImageSerializer,CommentSerializer,ResponseCommentSerializer,LikeSerializer,TagSerializer,UserTagSerializer
+from .models import CustomUser,Post,Image,Comment,ResponseComment,Like,Tag,UserTag,Follower,ViewedPost
+from .serializers import CustomUserSerializer, PostSerializer,ImageSerializer,CommentSerializer,ResponseCommentSerializer,LikeSerializer,TagSerializer,UserTagSerializer,ViewedPostSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -123,3 +123,61 @@ class FollowerToggleAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Follower.DoesNotExist:
             return Response({"detail": "Failed to toggle follow status."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class ViewedPostCreateAPIView(generics.CreateAPIView):
+    queryset = ViewedPost.objects.all()
+    serializer_class = ViewedPostSerializer
+
+    def create(self, request, *args, **kwargs):
+        user_id = request.data.get('user')
+        post_id = request.data.get('post')
+
+        if not user_id or not post_id:
+            return Response({"detail": "user and post fields are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = CustomUser.objects.get(id=user_id)
+            post = Post.objects.get(post_id=post_id)
+        except CustomUser.DoesNotExist:
+            return Response({"detail": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+        except Post.DoesNotExist:
+            return Response({"detail": "Post does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+        viewed_post, created = ViewedPost.objects.get_or_create(user=user, post=post)
+
+        if created:
+            return Response({"detail": "ViewedPost created successfully."}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"detail": "ViewedPost already exists."}, status=status.HTTP_200_OK)
+
+class UsersWhoViewedPostAPIView(APIView):
+    def get(self, request, post_id):
+        user_ids = ViewedPost.objects.filter(post_id=post_id).values_list('user_id', flat=True)
+        users = CustomUser.objects.filter(id__in=user_ids)
+        serializer = CustomUserSerializer(users, many=True)
+        return Response(serializer.data)
+    
+
+class PostsNotViewedByUserAPIView(APIView):
+    def get(self, request, user_id):
+        viewed_post_ids = ViewedPost.objects.filter(user_id=user_id).values_list('post_id', flat=True)
+        posts_not_viewed = Post.objects.exclude(post_id__in=viewed_post_ids)
+        serializer = PostSerializer(posts_not_viewed, many=True)
+        return Response(serializer.data)
+    
+class PostsViewedByUserAPIView(APIView):
+    def get(self, request, user_id):
+        viewed_post_ids = ViewedPost.objects.filter(user_id=user_id).values_list('post_id', flat=True)
+        posts_viewed = Post.objects.filter(post_id__in=viewed_post_ids)
+        serializer = PostSerializer(posts_viewed, many=True)
+        return Response(serializer.data)
+
+class UsersWhoViewedPostAPIView(APIView):
+    def get(self, request, post_id):
+        user_ids = ViewedPost.objects.filter(post_id=post_id).values_list('user_id', flat=True)
+        users = CustomUser.objects.filter(id__in=user_ids)
+        serializer = CustomUserSerializer(users, many=True)
+        return Response(serializer.data)

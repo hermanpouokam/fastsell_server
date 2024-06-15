@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser,Post,Image,Comment,ResponseComment,Like,Tag,UserTag,Follower
+from .models import CustomUser,Post,Image,Comment,ResponseComment,Like,Tag,UserTag,Follower,ViewedPost
 
 
 
@@ -37,7 +37,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['post_id','user', 'title', 'description', 'price', 'location','deleted', 'shared', 'sharer_user', 'comment']
+        fields = ['post_id','user', 'title', 'description', 'price', 'location','deleted', 'shared', 'sharer_user', 'comment','created_at', 'updated_at', 'selled']
 
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -73,3 +73,8 @@ class FollowerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follower
         fields = ['id', 'user', 'follower', 'followed_at', 'updated_at', 'following']
+
+class ViewedPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ViewedPost
+        fields = ['user', 'post', 'created_at'] 
