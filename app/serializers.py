@@ -59,7 +59,7 @@ class ResponseCommentSerializer(serializers.ModelSerializer):
 class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
-        fields = ['user', 'created_at', 'liked', 'post']
+        fields = ['id','user', 'created_at', 'liked', 'post']
     
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
