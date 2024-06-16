@@ -67,6 +67,31 @@ class LikeListCreateView(generics.ListCreateAPIView):
     queryset = Like.objects.all()
     serializer_class = LikeSerializer
 
+    def create(self, request, *args, **kwargs):
+        user_id = request.data.get('user')
+        post_id = request.data.get('post')
+
+        if not user_id or not post_id:
+            return Response({"detail": "user and post fields are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
+            return Response({"detail": "User does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            post = Post.objects.get(post_id=post_id)
+        except Post.DoesNotExist:
+            return Response({"detail": "Post does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+        like, created = Like.objects.get_or_create(user=user, post=post, defaults={'liked': True})
+        
+        if not created:
+            return Response({"detail": "User has already liked this post."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = self.get_serializer(like)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 class LikeRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Like.objects.all()
     serializer_class = LikeSerializer
