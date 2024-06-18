@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from .models import (CustomUser,Post,Image,Comment,ResponseComment,Like,Tag,UserTag,Follower,ViewedPost,FavoriteUserPost
-                     
+from .models import (CustomUser,Post,Image,Comment,ResponseComment,Like,Tag,UserTag,Follower,ViewedPost,FavoriteUserPost,
+                     LikeCommentResponse
                      )
-
+from django.contrib.contenttypes.models import ContentType
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -47,14 +47,33 @@ class ImageSerializer(serializers.ModelSerializer):
         fields = ['id', 'img_url', 'post']
 
 class CommentSerializer(serializers.ModelSerializer):
+    likes = serializers.SerializerMethodField()
+    responses = serializers.SerializerMethodField()
+
     class Meta:
         model = Comment
-        fields = ['id', 'post', 'comment_text', 'created_at', 'user_id','deleted']
+        fields = ['id', 'post', 'comment_text', 'created_at', 'user_id', 'deleted', 'likes','responses',]
+
+    def get_likes(self, obj):
+        content_type = ContentType.objects.get_for_model(Comment)
+        likes = LikeCommentResponse.objects.filter(content_type=content_type, object_id=obj.id)
+        return LikeResponseCommentSerializer(likes, many=True).data
+    def get_responses(self, obj):
+        responses = ResponseComment.objects.filter(comment=obj)
+        serializer = ResponseCommentSerializer(responses, many=True)
+        return serializer.data
 
 class ResponseCommentSerializer(serializers.ModelSerializer):
+    likes = serializers.SerializerMethodField()
+
     class Meta:
         model = ResponseComment
-        fields = ['id', 'post_id', 'comment', 'text', 'created_at', 'user', 'img','deleted']
+        fields = ['id', 'post_id', 'comment', 'text', 'created_at', 'user', 'img', 'deleted', 'likes']
+
+    def get_likes(self, obj):
+        content_type = ContentType.objects.get_for_model(ResponseComment)
+        likes = LikeCommentResponse.objects.filter(content_type=content_type, object_id=obj.id)
+        return LikeResponseCommentSerializer(likes, many=True).data
     
 class LikeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -85,3 +104,8 @@ class FavoriteUserPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = FavoriteUserPost
         fields = ['id', 'user', 'post', 'created_at']
+
+class LikeResponseCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LikeCommentResponse
+        fields = ['id', 'user', 'created_at', 'liked', 'content_type', 'object_id']

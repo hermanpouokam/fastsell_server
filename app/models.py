@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 class CustomUser(AbstractUser):
     number = models.CharField(max_length=20,blank=True)
@@ -179,3 +181,15 @@ class FavoriteUserPost(models.Model):
 
     def __str__(self):
         return f"{self.user.username} favorites {self.post.title}"
+
+
+class LikeCommentResponse(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    liked = models.BooleanField(default=True)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    def __str__(self):
+        return f"{self.user.username} likes {self.content_object}"

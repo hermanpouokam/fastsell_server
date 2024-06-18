@@ -1,14 +1,17 @@
 # myapp/views.py
 
 from rest_framework import generics
-from .models import CustomUser,Post,Image,Comment,ResponseComment,Like,Tag,UserTag,Follower,ViewedPost,FavoriteUserPost
+from .models import CustomUser,Post,Image,Comment,ResponseComment,Like,Tag,UserTag,Follower,ViewedPost,FavoriteUserPost,LikeCommentResponse
 from .serializers import (CustomUserSerializer, PostSerializer,ImageSerializer,CommentSerializer,
                           ResponseCommentSerializer,LikeSerializer,TagSerializer,UserTagSerializer,ViewedPostSerializer,
-                          FavoriteUserPostSerializer
+                          FavoriteUserPostSerializer,LikeResponseCommentSerializer
                           )
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.contrib.contenttypes.models import ContentType
+
 
 class UserListCreateView(generics.ListCreateAPIView):
     queryset = CustomUser.objects.all()
@@ -244,3 +247,44 @@ class FavoriteUserPostsByUserAPIView(generics.ListAPIView):
     def get_queryset(self):
         user_id = self.kwargs['user_id']  # Assuming 'user_id' is passed in URL parameters
         return FavoriteUserPost.objects.filter(user=user_id)
+
+class CommentResponseLikeView(APIView):
+    def post(self, request):
+        user_id = request.data.get('user')
+        object_id = request.data.get('object_id')
+        content_type = request.data.get('content_type')
+
+        if not user_id or not object_id or not content_type:
+            return Response({"detail": "user, object_id, and content_type fields are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
+            return Response({"detail": "User does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+        if content_type == "comment":
+            model = Comment
+        elif content_type == "response":
+            model = ResponseComment
+        else:
+            return Response({"detail": "Invalid content_type. Must be 'comment' or 'response'."}, status=status.HTTP_400_BAD_REQUEST)
+
+        content_type_obj = ContentType.objects.get_for_model(model)
+
+        try:
+            content_object = model.objects.get(id=object_id)
+        except model.DoesNotExist:
+            return Response({"detail": f"{model.__name__} does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+        like, created = LikeCommentResponse.objects.get_or_create(
+            user=user,
+            content_type=content_type_obj,
+            object_id=object_id,
+            defaults={'liked': True}
+        )
+
+        if not created:
+            return Response({"detail": "User has already liked this content."}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = LikeResponseCommentSerializer(like)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

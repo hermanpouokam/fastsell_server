@@ -8,7 +8,7 @@ from .views import (UserListCreateView, UserRetrieveUpdateDestroyView,PostListCr
                     TagRetrieveUpdateDestroyView,UserTagListCreateView,UserTagRetrieveUpdateDestroyView,
                     FollowerToggleAPIView,ViewedPostCreateAPIView,PostsNotViewedByUserAPIView,PostsViewedByUserAPIView,
                     UsersWhoViewedPostAPIView,FavoriteUserPostListCreateAPIView,FavoriteUserPostRetrieveDestroyAPIView,
-                    FavoriteUserPostsByUserAPIView
+                    FavoriteUserPostsByUserAPIView,CommentResponseLikeView
                     )
 from .functions import get_post_comments,get_comment_responses,get_user_posts,get_post_likes,get_user_tag_list
 
@@ -40,10 +40,10 @@ urlpatterns = [
     path('posts/not-viewed/<int:user_id>/', PostsNotViewedByUserAPIView.as_view(), name='posts-not-viewed-by-user'),
     path('posts/viewed/<int:user_id>/', PostsViewedByUserAPIView.as_view(), name='posts-viewed-by-user'),
     path('posts/viewed-users/<int:post_id>/', UsersWhoViewedPostAPIView.as_view(), name='users-who-viewed-post'),
-     path('favorite-posts/',FavoriteUserPostListCreateAPIView.as_view(), name='favorite-posts-list-create'),
+    path('favorite-posts/',FavoriteUserPostListCreateAPIView.as_view(), name='favorite-posts-list-create'),
     path('favorite-posts/<int:id>/', FavoriteUserPostRetrieveDestroyAPIView.as_view(), name='favorite-post-retrieve-destroy'),
     path('favorite-posts/user/<int:user_id>/', FavoriteUserPostsByUserAPIView.as_view(), name='favorite-posts-by-user'),
-
+    path('like-comment-response/', CommentResponseLikeView.as_view(), name='comment-response-like'),
 
 
 ] 
