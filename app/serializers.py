@@ -36,11 +36,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
     
-class PostSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Post
-        fields = ['post_id','user', 'title', 'description', 'price', 'location','deleted', 'shared', 'sharer_user', 'comment','created_at', 'updated_at', 'selled']
-
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
@@ -74,6 +69,20 @@ class ResponseCommentSerializer(serializers.ModelSerializer):
         content_type = ContentType.objects.get_for_model(ResponseComment)
         likes = LikeCommentResponse.objects.filter(content_type=content_type, object_id=obj.id)
         return LikeResponseCommentSerializer(likes, many=True).data
+
+class PostSerializer(serializers.ModelSerializer):
+    comments = CommentSerializer(many=True, read_only=True)
+    response_comments = ResponseCommentSerializer(many=True, read_only=True)
+    likes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Post
+        fields = ['post_id', 'user', 'title', 'description', 'price', 'location', 'deleted', 'shared', 'sharer_user',
+                  'comment', 'created_at', 'updated_at', 'selled', 'comments', 'response_comments', 'likes']
+
+    def get_likes(self, obj):
+        likes = Like.objects.filter(post=obj)
+        return LikeSerializer(likes, many=True).data
     
 class LikeSerializer(serializers.ModelSerializer):
     class Meta:
