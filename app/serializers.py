@@ -74,11 +74,12 @@ class PostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
     response_comments = ResponseCommentSerializer(many=True, read_only=True)
     likes = serializers.SerializerMethodField()
+    images = ImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Post
         fields = ['post_id', 'user', 'title', 'description', 'price', 'location', 'deleted', 'shared', 'sharer_user',
-                  'comment', 'created_at', 'updated_at', 'selled', 'comments', 'response_comments', 'likes']
+                  'comment', 'created_at', 'updated_at', 'selled', 'comments', 'response_comments', 'likes','images']
 
     def get_likes(self, obj):
         likes = Like.objects.filter(post=obj)
