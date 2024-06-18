@@ -74,7 +74,7 @@ class PostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
     response_comments = ResponseCommentSerializer(many=True, read_only=True)
     likes = serializers.SerializerMethodField()
-    images = ImageSerializer(many=True, read_only=True)
+    images = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -84,6 +84,9 @@ class PostSerializer(serializers.ModelSerializer):
     def get_likes(self, obj):
         likes = Like.objects.filter(post=obj)
         return LikeSerializer(likes, many=True).data
+    def get_images(self, obj):
+        images = Image.objects.filter(post=obj)
+        return ImageSerializer(images, many=True).data
     
 class LikeSerializer(serializers.ModelSerializer):
     class Meta:
