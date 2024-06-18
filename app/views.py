@@ -288,3 +288,8 @@ class CommentResponseLikeView(APIView):
 
         serializer = LikeResponseCommentSerializer(like)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+class LikeResponseCommentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = LikeCommentResponse.objects.all()
+    serializer_class = LikeResponseCommentSerializer
+    lookup_field = 'id'
