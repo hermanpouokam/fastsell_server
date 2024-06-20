@@ -47,7 +47,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ['id', 'post', 'comment_text', 'created_at', 'user_id', 'deleted', 'likes','responses',]
+        fields = ['id', 'post', 'comment_text', 'created_at', 'user_id', 'deleted','image', 'likes','responses',]
 
     def get_likes(self, obj):
         content_type = ContentType.objects.get_for_model(Comment)

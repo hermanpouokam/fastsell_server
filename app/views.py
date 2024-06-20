@@ -54,7 +54,7 @@ class CommentListCreateView(generics.ListCreateAPIView):
 class CommentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    lookup_field = 'post_id'
+    lookup_field = 'id'
 
 class ResponseCommentListCreateView(generics.ListCreateAPIView):
     queryset = ResponseComment.objects.all()

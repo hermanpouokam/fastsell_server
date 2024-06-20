@@ -90,7 +90,7 @@ class Comment(models.Model):
         null=True,
         blank=True
     )
-    image = models.TextField()
+    image = models.TextField(null=True)
 
     def __str__(self):
         return self.comment_text
